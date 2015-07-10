@@ -74,5 +74,29 @@ module.exports = {
 
   find: function(searchTerms, cb) {
     pagesRepo.find(searchTerms, cb);
+  },
+  getOneBySlug: function(slug, revision, cb) {
+    if (typeof revision === "function") {
+      cb = revision;
+      revision = 1;
+    }
+    pagesRepo.query(
+      "SELECT *, (SELECT MAX(revision) FROM pages WHERE slug = ?) " +
+      "AS maxRev FROM pages WHERE slug = ? AND revision = ?",
+      [slug, slug, revision], function(err, page) {
+        if (err) {
+          return cb(err);
+        }
+        cb(void 0, page[0]);
+      }
+    );
+  },
+  getAllBySlug: function(slug, cb) {
+    pagesRepo.query(
+      "SELECT published, updated, author, authorEmail, revision, visible, title FROM pages " +
+      "WHERE slug = ? ORDER BY published ASC",
+      [slug],
+      cb
+    );
   }
 };
