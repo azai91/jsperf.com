@@ -1,0 +1,35 @@
+When Creating remove username/url/etc
+
+Post
+	- /server/web/home/index.js#70
+	- /server/services/pages.js#37
+		- Current
+			- Create BrowserScope
+			- Create Page
+				- p1.id AS pID,
+				- p1.slug AS url,
+				- p1.revision,
+				- p1.title,
+				- p1.published,
+				- p1.updated,
+			- Create Tests
+		- Ideal
+			- Create BrowserScope
+			- Create gist for that user - Replace much of it with making post requests to github gists (https://developer.github.com/v3/gists/)
+				- When Editing
+					- (If not owner) - Create Fork? 
+					- 
+
+	- Weird things
+		- Why are they creating the slug clientside?
+			- /server/web/home/index.hbs#40
+			- /server/web/home/index.js#92
+
+
+Get Single
+	-List Revisions
+		-Mark Revision as Broken
+
+
+They don't have a test page
+

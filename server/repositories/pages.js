@@ -13,6 +13,14 @@ var genericQuery = function(q, cb) {
 };
 
 module.exports = {
+  query: function(string, args, cb) {
+    var conn = db.createConnection();
+
+    conn.query(string, args, cb);
+    // Not sure why we aren't holding up a persistant connection
+    // That is ok I suppose
+    conn.end();
+  },
   create: function(payload, cb) {
     var conn = db.createConnection();
 
@@ -26,7 +34,6 @@ module.exports = {
 
     conn.end();
   },
-
   get: function(fields, where, cb) {
     var conn = db.createConnection();
 

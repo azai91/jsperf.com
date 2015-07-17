@@ -1,0 +1,145 @@
+{{!--
+	https://github.com/mathiasbynens/jsperf.com/blob/002825bc3b111714ec0b7b2e02bed72258fdf492/_inc/start.php#L104
+	Need to implement author function and create links when applicable
+--}}
+
+<hgroup>
+	<h1>{{page.title}}</h1>
+	<h2>JavaScript performance comparison</h2>
+</hgroup>
+<p class="meta">
+  {{#ifCond page.revision '>' 1}}
+		Revision {{page.revision}}of this test case
+	{{else}}
+		Test case
+	{{/ifCond}}
+	 created {{page.author}}
+  <time datetime="{{DatetoISOString page.published}}" pubdate>
+    {{relativeDate page.published}}
+  </time>
+  {{#ifCond page.published "!=" page.updated}}
+    and last updated <time datetime="{{DatetoISOString page.updated}}">{{relativeDate page.updated}}</time>
+  {{/ifCond}}
+	{{!--
+		https://github.com/mathiasbynens/jsperf.com/blob/002825bc3b111714ec0b7b2e02bed72258fdf492/_tpl/testPage.tpl#L23
+
+		TODO: Implement edit and published aspects
+	--}}
+  {{#if page.info}}
+    <section>
+      <h2>Info</h2>
+      {{markdown page.info}}
+    </section>
+  {{/if}}
+  {{#ifCond page.initHTML "||" page.setup "||" page.teardown}}
+    <section id="prep-code">
+    <h2>Preparation code</h2>
+    <pre><code>{{!--
+			https://github.com/mathiasbynens/jsperf.com/blob/002825bc3b111714ec0b7b2e02bed72258fdf492/_tpl/testPage.tpl#L35
+			TODO: Prep Code Rendering
+		--}}</code></pre>
+  {{/ifCond}}
+  <section id="runner">
+  <h2>Test runner</h2>
+  <p id="firebug">
+		<strong>
+			Warning! For accurate results, please disable Firebug before running the tests.
+			<a href="/faq#firebug-warning">(Why?)</a>
+		</strong>
+	</p>
+  <p id="java"><strong>Java applet disabled.</strong></p>
+  <p id="status"><noscript><strong>
+		To run the tests, please <a href="//enable-javascript.com/">enable JavaScript</a>
+		 and reload the page.
+	</strong></noscript></p>
+  <div id="controls"><button id="run" type="button"></button></div>
+  <table id="test-table">
+  	<caption>Testing in <span id="user-agent">{{userAgent}}</span></caption>
+  	<thead>
+  		<tr>
+  			<th colspan="2">Test</th>
+  			<th title="Operations per second (higher is better)">Ops/sec</th>
+  		</tr>
+  	</thead>
+  	<tbody>
+      {{#each tests}}
+    		<tr>
+    			<th scope="row" id="title-{{inc @index}}"><div>
+            {{addCode title}}
+            {{#ifCond page.initHTML "has" 'function init()'}}
+              <span id="extra-{{inc @index}}"></span>
+            {{/ifCond}}
+          </div></th>
+    			<td class="code">
+						<pre><code>
+							{{#ifCond 'y' "==" defer}}
+							<strong class="co1">// async test</strong><br>
+							{{/ifCond}}
+							{{{highlight code}}}
+						</code></pre>
+					</td>
+    			<td id="results-{{inc @index}}" class="results">pending…</td>
+    		</tr>
+      {{/each}}
+  	</tbody>
+  </table>
+  {{#ifCond page.maxRev "<=" 1}}
+    <p>
+      You can <a href="/{{slug}}{{#ifCond page.revision ">" 1}}/{{page.revision}}{{/ifCond}}/edit" rel="nofollow">
+        edit these tests or add even more tests to this page
+      </a> by appending <code>/edit</code> to the URL.
+    </p>
+  {{/ifCond}}
+</section>
+{{#if page.browserscopeID}}
+  <section>
+    <h2 id="results">Compare results of other browsers</h2>
+    <div id="bs-results"></div>
+  </section>
+{{/if}}
+{{#ifCond page.maxRev ">" 1}}
+  <section>
+    <h2>Revisions</h2>
+    <p>
+      You can <a href="/{{slug}}{{#ifCond page.revision ">" 1}}/{{page.revision}}{{/ifCond}}/edit" rel="nofollow">
+        edit these tests or add even more tests to this page
+      </a> by appending <code>/edit</code> to the URL. Here’s a list of current revisions for this page:
+    </p>
+    <ul>
+      {{#each revisions}}
+        <li {{#ifCond page.revision "==" revision}}class="current"{{/ifCond}}>
+          <a href="/{{slug}}{{#ifCond revision ">" 1}}/{{revision}}{{/ifCond}}">Revision {{revision}}</a>:
+          published {{#if author}}by {{author}} {{/if}}
+          <time datetime="{{DatetoISOString published}}" pubdate>{{relativeDate published}}</time>
+          {{#ifCond published "!=" updated}} and last updated
+            <time datetime="{{DatetoISOString updated}}">{{relativeDate updated}}</time>
+          {{/ifCond}}
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+{{/ifCond}}
+<script src="http://a.jsperf.com/benchmark-1.js"></script>
+<script>
+{{#if page.browserscopeID}}
+  ui.browserscope.key = '{{page.browserscopeID}}';
+{{/if}}
+  ui{{#each tests as |test index|}}.add(
+		'{{prepJSString test.title}}',
+		{{#ifCond 'y' '==' test.defer}}
+	    {
+	    	'defer': true,
+	    	'fn': '\\\n      {{stdLine (prepJSString test.code)}}'
+			}
+		{{else}}
+			"\\\n    {{stdLine (prepJSString test.code)}}"
+		{{/ifCond}}
+	){{/each}};
+{{#if page.setup}}
+	Benchmark.prototype.setup = '\\\n    {{stdLine (prepJSString page.setup)}}';
+{{/if}}
+{{#if page.teardown}}
+	Benchmark.prototype.setup = '\\\n    {{stdLine (prepJSString page.teardown)}}';
+{{/if}}
+</script>
+{{>comments}}

@@ -29,5 +29,9 @@ module.exports = {
     });
 
     conn.end();
+  }, getByPageId: function(id, cb) {
+    var conn = db.createConnection();
+    conn.query("SELECT * FROM tests WHERE pageID = ? ORDER BY testID ASC", id, cb);
+    conn.end();
   }
 };
